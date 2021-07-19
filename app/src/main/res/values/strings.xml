@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">InfinitelyFlu</string>
+    <!-- Strings related to login -->
+    <string name="template_name">Template Name</string>
+    <string name="template_version">Template Version</string>
+    <string name="fetch_template">Fetch Template</string>
+</resources>
