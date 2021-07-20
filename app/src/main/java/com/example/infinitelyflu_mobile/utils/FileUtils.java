@@ -22,7 +22,7 @@ public class FileUtils {
         Log.d(TAG, "开始下载");
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("http://localhost:8080/InfinitelyFlu_server_war/template/downloadTemplate?name=test&&version=0.1")
+                .url("http://127.0.0.1:8080/InfinitelyFlu_server_war/template/downloadTemplate?name=test&&version=0.1")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
