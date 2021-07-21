@@ -2,6 +2,7 @@ package com.example.infinitelyflu_mobile.data;
 
 /**
  * @author ximao
+ * @date 2021/7/21
  * 模板数据类
  */
 public class Template {
