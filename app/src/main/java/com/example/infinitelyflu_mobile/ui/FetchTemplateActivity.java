@@ -2,7 +2,6 @@ package com.example.infinitelyflu_mobile.ui;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
