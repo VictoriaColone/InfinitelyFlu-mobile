@@ -1,5 +1,6 @@
 package com.example.infinitelyflu_mobile.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -24,7 +25,9 @@ public class FetchTemplateActivity extends AppCompatActivity {
 
     private  ProgressBar mLoadingProgressBar;
 
-    private  Button mLoginButton;
+    private  Button mFetchButton;
+
+    private  Button mOpenPreviewButton;
 
     private  EditText mTemplateName;
 
@@ -33,16 +36,22 @@ public class FetchTemplateActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fetch_template);
-
         mTemplateName = findViewById(R.id.name);
         mTemplateVersion = findViewById(R.id.version);
-        mLoginButton = findViewById(R.id.fetch);
+        mFetchButton = findViewById(R.id.fetch);
+        mOpenPreviewButton = findViewById(R.id.open_preview);
         mLoadingProgressBar = findViewById(R.id.loading);
 
+        initClickListener();
+    }
 
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
+    private void initClickListener() {
+
+        // 拉取if文件
+        mFetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mLoadingProgressBar.setVisibility(View.VISIBLE);
@@ -65,6 +74,13 @@ public class FetchTemplateActivity extends AppCompatActivity {
             }
         });
 
+        // 跳转预览页面
+        mOpenPreviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FetchTemplateActivity.this, IFTemplatePreviewActivity.class));
+            }
+        });
     }
 
     public interface DownloadListener {
