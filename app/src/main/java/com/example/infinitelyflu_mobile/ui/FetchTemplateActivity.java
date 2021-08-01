@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.infinitelyflu_mobile.R;
+import com.example.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
 import com.example.infinitelyflu_mobile.utils.FileUtils;
 
 
@@ -44,8 +45,10 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mFetchButton = findViewById(R.id.fetch);
         mOpenPreviewButton = findViewById(R.id.open_preview);
         mLoadingProgressBar = findViewById(R.id.loading);
-
         initClickListener();
+
+        // yutao todo createview时机放到下发回调中
+        creatIFView();
     }
 
     private void initClickListener() {
@@ -83,6 +86,16 @@ public class FetchTemplateActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * IF引擎创建视图
+     */
+    private void creatIFView() {
+
+    }
+
+    /**
+     *
+     */
     public interface DownloadListener {
         void callback();
     }
