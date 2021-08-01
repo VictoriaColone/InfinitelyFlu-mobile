@@ -1,5 +1,6 @@
 package com.example.infinitelyflu_mobile.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.infinitelyflu_mobile.R;
 import com.example.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
+import com.example.infinitelyflu_mobile.utils.DownloadListener;
 import com.example.infinitelyflu_mobile.utils.FileUtils;
 
 
@@ -47,12 +49,11 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mLoadingProgressBar = findViewById(R.id.loading);
         initClickListener();
 
-        // yutao todo createview时机放到下发回调中
-        creatIFView();
+        // yutao todo 初始化引擎，后续放到文件下载回调中
+        initIFEngineAndCreateView(FetchTemplateActivity.this);
     }
 
     private void initClickListener() {
-
         // 拉取if文件
         mFetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,10 +63,11 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 String templateVersion = mTemplateVersion.getText().toString();
                 if (!TextUtils.isEmpty(templateName) && !TextUtils.isEmpty(templateVersion)) {
                     Log.d(TAG, templateName + "   " + templateVersion);
-                    // yutao todo 调用后端下载接口
-                    FileUtils.downloadFileAsync(templateName, templateVersion, getApplicationContext(), new DownloadListener() {
+                    // 文件下载
+                    FileUtils.downloadFileAsync(templateName, templateVersion, getApplicationContext(),
+                            new DownloadListener() {
                         @Override
-                        public void callback() {
+                        public void downloadCallback() {
                             mLoadingProgressBar.setVisibility(View.GONE);
                             Toast.makeText(getBaseContext(), "Download Success", Toast.LENGTH_LONG).show();
                         }
@@ -76,7 +78,6 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 }
             }
         });
-
         // 跳转预览页面
         mOpenPreviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,17 +88,13 @@ public class FetchTemplateActivity extends AppCompatActivity {
     }
 
     /**
-     * IF引擎创建视图
+     * yutao todo createview和初始化时机都放到下发回调中
+     * IF引擎初始化
+     * @param context
      */
-    private void creatIFView() {
-
-    }
-
-    /**
-     *
-     */
-    public interface DownloadListener {
-        void callback();
+    private void initIFEngineAndCreateView(Context context) {
+        InfinitelyFluEngine.newInstance(context);
+        InfinitelyFluEngine.getInstance().creatView();
     }
 
 }

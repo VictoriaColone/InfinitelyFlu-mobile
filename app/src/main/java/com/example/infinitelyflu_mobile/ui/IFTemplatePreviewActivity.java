@@ -1,14 +1,11 @@
 package com.example.infinitelyflu_mobile.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import com.example.infinitelyflu_mobile.R;
 import com.example.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
+import org.json.JSONObject;
 
 
 /**
@@ -22,28 +19,31 @@ public class IFTemplatePreviewActivity extends AppCompatActivity {
     /**
      * TAG
      */
-    public static final String TAG = "IFTemplatePreviewActivity";
+    private static final String TAG = "IFTemplatePreviewActivity";
     /**
      * 视图容器
      */
     private ViewGroup mContainer;
-
+    /**
+     * 持有引擎对象
+     * @param
+     */
+    private InfinitelyFluEngine mIFEngine = InfinitelyFluEngine.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
         mContainer = findViewById(R.id.rv_main_container);
-        insertView(mContainer);
-        InfinitelyFluEngine infinitelyFluEngine = new InfinitelyFluEngine(this);
-        infinitelyFluEngine.creatView();
-        infinitelyFluEngine.insertView(mContainer);
+        // 将RootView传入到IF引擎中
+        mIFEngine.setRootView(mContainer);
+        InfinitelyFluEngine.getInstance().insertView();
     }
 
     /**
      * 插入视图
      */
-    private void insertView(ViewGroup rootView) {
+    private void insertView() {
     }
 
 }

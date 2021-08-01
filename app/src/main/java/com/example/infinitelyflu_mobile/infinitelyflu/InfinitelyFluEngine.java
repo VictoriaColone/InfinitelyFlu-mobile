@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.example.infinitelyflu_mobile.R;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 
@@ -21,7 +21,7 @@ public class InfinitelyFluEngine {
     /**
      * TAG
      */
-    public static final String TAG = "InfinitelyFluEngine";
+    private static final String TAG = "InfinitelyFluEngine";
     /**
      * 单例
      */
@@ -43,15 +43,67 @@ public class InfinitelyFluEngine {
      */
     private JSONObject mJsonData;
 
-    public InfinitelyFluEngine(Context context) {
+    /**
+     * 构造函数
+     * @param context
+     */
+    private InfinitelyFluEngine(Context context) {
         this.mContext = context;
     }
 
     /**
-     * 获取根布局
+     * 单例构造
+     * @param context  上下文
      */
-    public View getRootView () {
+    public static void newInstance(Context context) {
+        if (mInfinitelyFluEngine == null) {
+            synchronized (InfinitelyFluEngine.class) {
+                if (mInfinitelyFluEngine == null) {
+                    mInfinitelyFluEngine = new InfinitelyFluEngine(context);
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取单例
+     * @return mInfinitelyFluEngine
+     */
+    public static InfinitelyFluEngine getInstance() {
+        return mInfinitelyFluEngine;
+    }
+
+    /**
+     * 设置根视图
+     * @param rootView
+     */
+    public void setRootView(ViewGroup rootView) {
+        this.mRootView = rootView;
+    }
+
+    /**
+     * 获取根视图
+     * @return rootView
+     */
+    public ViewGroup getRootView() {
         return mRootView;
+    }
+
+    /**
+     * 设置数据
+     * @param data
+     */
+    public void setJsonData(JSONObject data) {
+        this.mJsonData = mJsonData;
+    }
+
+
+    /**
+     * 获取数据
+     * @return json
+     */
+    public JSONObject getJsonData() {
+        return mJsonData;
     }
 
     /**
@@ -59,17 +111,18 @@ public class InfinitelyFluEngine {
      */
     @SuppressLint("ResourceAsColor")
     public void creatView() {
-        TextView parentView = new TextView(mContext);
-        parentView.setText("yutao=======test");
-        mViewSet.add(parentView);
+//        TextView parentView = new TextView(mContext);
+//        parentView.setText("yutao=======test");
+//        mViewSet.add(parentView);
         TextView childView = new TextView(mContext);
         childView.setText("yutao===test");
-//        mRootView.addView(childView);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout view = new LinearLayout(mContext);
+
+
+        view.setBackgroundColor(R.color.design_dark_default_color_background);
         view.setLayoutParams(lp);//设置布局参数
-        view.setBackgroundColor(android.R.color.black);
         view.setOrientation(LinearLayout.VERTICAL);// 设置子View的Linearlayout// 为垂直方向布局
         view.addView(childView);
         mViewSet.add(view);
@@ -78,10 +131,10 @@ public class InfinitelyFluEngine {
     /**
      * 使用前调用View.getchildAt()定位父布局
      */
-    @SuppressLint("ResourceAsColor")
-    public void insertView(ViewGroup rootView) {
+    public void insertView() {
+        // 添加view前必须进行一次remove操作
         for (View view : mViewSet) {
-            rootView.addView(view);
+            mRootView.addView(view);
         }
     }
 

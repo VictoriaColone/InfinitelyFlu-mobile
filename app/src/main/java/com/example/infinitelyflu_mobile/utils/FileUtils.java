@@ -25,7 +25,7 @@ public class FileUtils {
      * @param callback
      */
     public static void downloadFileAsync(String templateName, String templateVersion, Context context,
-                                         FetchTemplateActivity.DownloadListener callback) {
+                                         DownloadListener callback) {
         Log.d(TAG, "开始下载");
 
         /**
@@ -60,7 +60,7 @@ public class FileUtils {
                         public void run() {
                             try {
                                 Log.d(TAG, "run on mainthread");
-                                callback.callback();
+                                callback.downloadCallback();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
