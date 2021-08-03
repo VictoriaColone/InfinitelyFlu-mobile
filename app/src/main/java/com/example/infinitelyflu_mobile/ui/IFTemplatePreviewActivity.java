@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 import com.example.infinitelyflu_mobile.R;
 import com.example.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
-import org.json.JSONObject;
 
 
 /**
@@ -35,15 +34,16 @@ public class IFTemplatePreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
         mContainer = findViewById(R.id.rv_main_container);
+        mContainer.removeAllViews();
         // 将RootView传入到IF引擎中
         mIFEngine.setRootView(mContainer);
-        InfinitelyFluEngine.getInstance().insertView();
+        // 插入视图
+        mIFEngine.insertView();
     }
 
-    /**
-     * 插入视图
-     */
-    private void insertView() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        InfinitelyFluEngine.getInstance().clearIFData();
     }
-
 }

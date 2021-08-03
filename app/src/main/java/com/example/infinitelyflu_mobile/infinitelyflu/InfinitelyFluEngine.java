@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.example.infinitelyflu_mobile.R;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
@@ -41,7 +39,7 @@ public class InfinitelyFluEngine {
     /**
      * 模板字符串
      */
-    private JSONObject mJsonData;
+    private JSONObject mJsonData = new JSONObject();
 
     /**
      * 构造函数
@@ -78,6 +76,7 @@ public class InfinitelyFluEngine {
      * @param rootView
      */
     public void setRootView(ViewGroup rootView) {
+        rootView.removeAllViews();
         this.mRootView = rootView;
     }
 
@@ -111,30 +110,41 @@ public class InfinitelyFluEngine {
      */
     @SuppressLint("ResourceAsColor")
     public void creatView() {
-//        TextView parentView = new TextView(mContext);
-//        parentView.setText("yutao=======test");
-//        mViewSet.add(parentView);
-        TextView childView = new TextView(mContext);
-        childView.setText("yutao===test");
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        LinearLayout view = new LinearLayout(mContext);
-
-
-        view.setBackgroundColor(R.color.design_dark_default_color_background);
-        view.setLayoutParams(lp);//设置布局参数
-        view.setOrientation(LinearLayout.VERTICAL);// 设置子View的Linearlayout// 为垂直方向布局
-        view.addView(childView);
-        mViewSet.add(view);
+        TextView parentView = new TextView(mContext);
+        parentView.setText("yutao=======test");
+        mViewSet.add(parentView);
+//        TextView childView = new TextView(mContext);
+//        childView.setText("yutao===test");
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        LinearLayout view = new LinearLayout(mContext);
+//
+//
+//        view.setBackgroundColor(R.color.design_dark_default_color_background);
+//        view.setLayoutParams(lp);//设置布局参数
+//        view.setOrientation(LinearLayout.VERTICAL);// 设置子View的Linearlayout// 为垂直方向布局
+//        view.addView(childView);
+//        mViewSet.add(view);
     }
 
     /**
      * 使用前调用View.getchildAt()定位父布局
      */
     public void insertView() {
-        // 添加view前必须进行一次remove操作
+        // yutao todo 添加view前必须进行一次remove操作
         for (View view : mViewSet) {
             mRootView.addView(view);
+        }
+    }
+
+    /**
+     * 清理引擎数据
+     */
+    public void clearIFData() {
+        if (InfinitelyFluEngine.getInstance() != null) {
+            mViewSet = new ArrayList<>();
+            mJsonData = new JSONObject();
+            mRootView = null;
         }
     }
 

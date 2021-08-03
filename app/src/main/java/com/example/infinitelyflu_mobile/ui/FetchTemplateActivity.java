@@ -48,9 +48,14 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mOpenPreviewButton = findViewById(R.id.open_preview);
         mLoadingProgressBar = findViewById(R.id.loading);
         initClickListener();
+        InfinitelyFluEngine.newInstance(this);
+    }
 
-        // yutao todo 初始化引擎，后续放到文件下载回调中
-        initIFEngineAndCreateView(FetchTemplateActivity.this);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // yutao todo 创建视图，后续放到文件下载回调中
+        InfinitelyFluEngine.getInstance().creatView();
     }
 
     private void initClickListener() {
@@ -85,16 +90,6 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 startActivity(new Intent(FetchTemplateActivity.this, IFTemplatePreviewActivity.class));
             }
         });
-    }
-
-    /**
-     * yutao todo createview和初始化时机都放到下发回调中
-     * IF引擎初始化
-     * @param context
-     */
-    private void initIFEngineAndCreateView(Context context) {
-        InfinitelyFluEngine.newInstance(context);
-        InfinitelyFluEngine.getInstance().creatView();
     }
 
 }
