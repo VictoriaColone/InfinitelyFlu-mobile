@@ -1,4 +1,4 @@
-package com.example.infinitelyflu_mobile.infinitelyflu;
+package com.ximao.infinitelyflu_mobile.infinitelyflu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

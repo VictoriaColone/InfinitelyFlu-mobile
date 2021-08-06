@@ -1,6 +1,5 @@
-package com.example.infinitelyflu_mobile.ui;
+package com.ximao.infinitelyflu_mobile.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,10 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import com.example.infinitelyflu_mobile.R;
-import com.example.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
-import com.example.infinitelyflu_mobile.utils.DownloadListener;
-import com.example.infinitelyflu_mobile.utils.FileUtils;
+import com.ximao.infinitelyflu_mobile.R;
+import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
+import com.ximao.infinitelyflu_mobile.utils.DownloadListener;
+import com.ximao.infinitelyflu_mobile.utils.FileUtils;
+import com.ximao.infinitelyflu_mobile.utils.Nav;
 
 
 /**
@@ -63,6 +63,7 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mFetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Nav.from(FetchTemplateActivity.this).toUri("infinitelyflu://com.ximao.infinitelyflu_mobile/IFTemplatePreviewActivity");
                 mLoadingProgressBar.setVisibility(View.VISIBLE);
                 String templateName = mTemplateName.getText().toString();
                 String templateVersion = mTemplateVersion.getText().toString();

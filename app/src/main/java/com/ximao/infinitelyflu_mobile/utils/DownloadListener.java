@@ -1,4 +1,4 @@
-package com.example.infinitelyflu_mobile.utils;
+package com.ximao.infinitelyflu_mobile.utils;
 
 
 /**

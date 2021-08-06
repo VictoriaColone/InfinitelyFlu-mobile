@@ -1,4 +1,4 @@
-package com.example.infinitelyflu_mobile.data;
+package com.ximao.infinitelyflu_mobile.data;
 
 /**
  * @author ximao

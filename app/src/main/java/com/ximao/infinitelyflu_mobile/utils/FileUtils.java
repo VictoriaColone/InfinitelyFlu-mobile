@@ -1,10 +1,10 @@
-package com.example.infinitelyflu_mobile.utils;
+package com.ximao.infinitelyflu_mobile.utils;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import com.example.infinitelyflu_mobile.ui.FetchTemplateActivity;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;

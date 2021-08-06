@@ -1,4 +1,4 @@
-package com.example.infinitelyflu_mobile;
+package com.ximao.infinitelyflu_mobile;
 
 import org.junit.Test;
 
