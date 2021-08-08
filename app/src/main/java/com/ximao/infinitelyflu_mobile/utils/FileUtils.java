@@ -7,7 +7,13 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author ximao
@@ -17,6 +23,23 @@ import java.net.URL;
 public class FileUtils {
 
     private static final String TAG = "FileUtils";
+
+    public static final String METHOD_DOWNLOAD_TEMPLATE = "downloadTemplate";
+
+    public static final String METHOD_GET_TEMPLATE_JSON = "getTemplateJson";
+
+    public static final String NAME = "name";
+
+    public static final String VERSION = "version";
+
+    public static final String CONNECT_SIGN = "&&";
+
+    public static final String QUESTION_SIGN = "?";
+
+    public static final String EQUALS_SIGN = "=";
+
+    // 这个地址会IP需要实时变更，可以用ipconfig en0 查询，也可以用charles查询
+    private static final String URL = "http://192.168.0.106:8080/InfinitelyFlu_server_war/template/";
 
     /**
      * 下载文件
@@ -39,8 +62,9 @@ public class FileUtils {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://172.20.10.9:8080/InfinitelyFlu_server_war/template/downloadTemplate?name="
-                            + templateName +"&&version=" + templateVersion);
+                    URL url = new URL(URL + METHOD_DOWNLOAD_TEMPLATE + QUESTION_SIGN +
+                            NAME + EQUALS_SIGN + templateName + CONNECT_SIGN + VERSION + EQUALS_SIGN +
+                            templateVersion);
                     InputStream is = url.openStream();
                     //打开手机对应的输出流,输出到文件中
                     OutputStream os = context.openFileOutput(templateName + "_" + templateVersion
@@ -68,6 +92,32 @@ public class FileUtils {
                     });
                 } catch (Exception e) {
                     Log.e(TAG, "downloadFileAsync:" + e);
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 获取XML转成的Json
+     * @param templateName
+     * @param templateVersion
+     * @param callback
+     */
+    public static void getTemplateJsonAsync(String templateName, String templateVersion, Callback callback) {
+        Log.d(TAG, "开始获取Json");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                URL url = null;
+                try {
+                    url = new URL(URL + METHOD_GET_TEMPLATE_JSON + QUESTION_SIGN +
+                            NAME + EQUALS_SIGN + templateName + CONNECT_SIGN + VERSION + EQUALS_SIGN +
+                            templateVersion);
+                    OkHttpClient client=new OkHttpClient();
+                    Request request=new Request.Builder().url(url).build();
+                    client.newCall(request).enqueue(callback);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }).start();

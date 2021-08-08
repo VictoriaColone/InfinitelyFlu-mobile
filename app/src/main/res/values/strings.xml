@@ -3,6 +3,7 @@
     <!-- Strings related to login -->
     <string name="template_name">Template Name</string>
     <string name="template_version">Template Version</string>
-    <string name="fetch_template">Fetch Template</string>
+    <string name="fetch_template_xml">Fetch Template.xml</string>
+    <string name="fetch_template_json">Fetch Template.json</string>
     <string name="open_preview">Open Preview</string>
 </resources>

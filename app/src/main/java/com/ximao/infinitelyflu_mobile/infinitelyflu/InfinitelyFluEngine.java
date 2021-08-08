@@ -36,10 +36,6 @@ public class InfinitelyFluEngine {
      * 视图集
      */
     public ArrayList<View> mViewSet = new ArrayList<>();
-    /**
-     * 模板字符串
-     */
-    private JSONObject mJsonData = new JSONObject();
 
     /**
      * 构造函数
@@ -76,7 +72,6 @@ public class InfinitelyFluEngine {
      * @param rootView
      */
     public void setRootView(ViewGroup rootView) {
-        rootView.removeAllViews();
         this.mRootView = rootView;
     }
 
@@ -89,30 +84,14 @@ public class InfinitelyFluEngine {
     }
 
     /**
-     * 设置数据
-     * @param data
-     */
-    public void setJsonData(JSONObject data) {
-        this.mJsonData = mJsonData;
-    }
-
-
-    /**
-     * 获取数据
-     * @return json
-     */
-    public JSONObject getJsonData() {
-        return mJsonData;
-    }
-
-    /**
      * 创建视图
      */
     @SuppressLint("ResourceAsColor")
-    public void creatView() {
-        TextView parentView = new TextView(mContext);
-        parentView.setText("yutao=======test");
-        mViewSet.add(parentView);
+    public void creatView(JSONObject jsonObject) {
+        View templateView = IFWidgetTreeFactory.createViewTree(jsonObject);
+//        TextView parentView = new TextView(mContext);
+//        parentView.setText("yutao=======test");
+//        mViewSet.add(parentView);
 //        TextView childView = new TextView(mContext);
 //        childView.setText("yutao===test");
 //        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -124,14 +103,17 @@ public class InfinitelyFluEngine {
 //        view.setLayoutParams(lp);//设置布局参数
 //        view.setOrientation(LinearLayout.VERTICAL);// 设置子View的Linearlayout// 为垂直方向布局
 //        view.addView(childView);
-//        mViewSet.add(view);
+        if (templateView == null) {
+            return;
+        }
+        mViewSet.add(templateView);
     }
 
     /**
      * 使用前调用View.getchildAt()定位父布局
      */
     public void insertView() {
-        // yutao todo 添加view前必须进行一次remove操作
+        mRootView.removeAllViews();
         for (View view : mViewSet) {
             mRootView.addView(view);
         }
@@ -143,9 +125,14 @@ public class InfinitelyFluEngine {
     public void clearIFData() {
         if (InfinitelyFluEngine.getInstance() != null) {
             mViewSet = new ArrayList<>();
-            mJsonData = new JSONObject();
             mRootView = null;
         }
+    }
+
+    /**
+     * 缓存TemplateJson
+     */
+    public void cacheTemplateJson() {
     }
 
 }

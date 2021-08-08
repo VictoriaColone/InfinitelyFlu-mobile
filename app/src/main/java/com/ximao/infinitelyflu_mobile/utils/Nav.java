@@ -11,6 +11,8 @@ import android.os.Bundle;
  * @author ximao
  * @date 2021/08/06
  * 唤端工具
+ * 使用demo
+ * Nav.from(FetchTemplateActivity.this).toUri("infinitelyflu://com.ximao.infinitelyflu_mobile/IFTemplatePreviewActivity");
  */
 public class Nav {
 
