@@ -1,10 +1,12 @@
 package com.ximao.infinitelyflu_mobile.utils.apm;
 
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
+import android.text.TextUtils;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -20,6 +22,14 @@ import java.util.TimerTask;
 public class CpuMonitorUtils {
 
     private Handler mHandler;
+
+    private RandomAccessFile mProcStatFile;
+
+    private RandomAccessFile mAppStatFile;
+
+    private Long mLastCpuTime;
+
+    private Long mLastAppCpuTime;
 
     TimerTask task = new TimerTask() {
         @Override
@@ -43,101 +53,116 @@ public class CpuMonitorUtils {
     private void showCupRate() {
         Message msg = mHandler.obtainMessage();
         msg.what = 200;
-        float result = getCpuUsed();
-        msg.obj = result;
+        float result;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            result = getCpuRateForO();
+        } else {
+            result = getCpuRate();
+        }
+
+        msg.obj = result + " %";
         mHandler.sendMessage(msg);
     }
 
     /**
-     * test yutao todo 方案二不行，无权限
+     * 获取CPU占用率 Android 8.0以下
      */
-    private float getCpuUsed() {
+    private float getCpuRate() {
+        long cpuTime;
+        long appTime;
+        float value = 0.0f;
         try {
-            RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
-            String load = reader.readLine();
-            String[] toks = load.split(" ");
-            long idle1 = Long.parseLong(toks[5]);
-            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
-            try {
-                Thread.sleep(360);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (mProcStatFile == null || mAppStatFile == null) {
+                mProcStatFile = new RandomAccessFile("/proc/stat", "r");
+                mAppStatFile = new RandomAccessFile("/proc/" + android.os.Process.myPid() + "/stat", "r");
+            } else {
+                mProcStatFile.seek(0L);
+                mAppStatFile.seek(0L);
             }
-            reader.seek(0);
-            load = reader.readLine();
-            reader.close();
-            toks = load.split(" ");
-            long idle2 = Long.parseLong(toks[5]);
-            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
-            return (float) (cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            String procStatString = mProcStatFile.readLine();
+            String appStatString = mAppStatFile.readLine();
+            String procStats[] = procStatString.split(" ");
+            String appStats[] = appStatString.split(" ");
+            cpuTime = Long.parseLong(procStats[2]) + Long.parseLong(procStats[3])
+                    + Long.parseLong(procStats[4]) + Long.parseLong(procStats[5])
+                    + Long.parseLong(procStats[6]) + Long.parseLong(procStats[7])
+                    + Long.parseLong(procStats[8]);
+            appTime = Long.parseLong(appStats[13]) + Long.parseLong(appStats[14]);
+            if (mLastCpuTime == null && mLastAppCpuTime == null) {
+                mLastCpuTime = cpuTime;
+                mLastAppCpuTime = appTime;
+                return value;
+            }
+            value = ((float) (appTime - mLastAppCpuTime) / (float) (cpuTime - mLastCpuTime)) * 100f;
+            mLastCpuTime = cpuTime;
+            mLastAppCpuTime = appTime;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
+    /**
+     * 获取CPU占用率 Android 8.0以上
+     */
+    private float getCpuRateForO() {
+        java.lang.Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("top -n 1");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            int cpuIndex = -1;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (TextUtils.isEmpty(line)) {
+                    continue;
+                }
+                int tempIndex = getCPUIndex(line);
+                if (tempIndex != -1) {
+                    cpuIndex = tempIndex;
+                    continue;
+                }
+                if (line.startsWith(String.valueOf(Process.myPid()))) {
+                    if (cpuIndex == -1) {
+                        continue;
+                    }
+                    String[] param = line.split("\\s+");
+                    if (param.length <= cpuIndex) {
+                        continue;
+                    }
+                    String cpu = param[cpuIndex];
+                    if (cpu.endsWith("%")) {
+                        cpu = cpu.substring(0, cpu.lastIndexOf("%"));
+                    }
+                    float rate = Float.parseFloat(cpu) / Runtime.getRuntime().availableProcessors();
+                    return rate;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
         }
         return 0;
     }
 
     /**
-     * 获取CPU使用率 yutao todo 方案一不行，已经无法获取到
+     * 获取CPU 指示数
+     * @param line
+     * @return
      */
-    private float getProcessCpuRate() {
-        float totalCpuTime1 = getTotalCpuTime();
-        float processCpuTime1 = getAppCpuTime();
-        try {
-            Thread.sleep(360);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private int getCPUIndex(String line) {
+        if (line.contains("CPU")) {
+            String[] titles = line.split("\\s+");
+            for (int i = 0; i < titles.length; i++) {
+                if (titles[i].contains("CPU")) {
+                    return i;
+                }
+            }
         }
-        float totalCpuTime2 = getTotalCpuTime();
-        float processCpuTime2 = getAppCpuTime();
-
-        float cpuRate = 100 * (processCpuTime2 - processCpuTime1) / (totalCpuTime2 - totalCpuTime1);
-        return cpuRate;
-    }
-
-    /**
-     * 获取系统总CPU使用时间
-     * @return CPU总使用时长
-     */
-    private long getTotalCpuTime() {
-        String[] cpuInfos = null;
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("/proc/stat")), 1000);
-            String load = reader.readLine();
-            reader.close();
-            cpuInfos = load.split(" ");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        long totalCpu = Long.parseLong(cpuInfos[2])
-                + Long.parseLong(cpuInfos[3]) + Long.parseLong(cpuInfos[4])
-                + Long.parseLong(cpuInfos[6]) + Long.parseLong(cpuInfos[5])
-                + Long.parseLong(cpuInfos[7]) + Long.parseLong(cpuInfos[8]);
-        return totalCpu;
-    }
-
-    /**
-     * 获取app占用CPU时长
-     * @return app占用CPU时长
-     */
-    private long getAppCpuTime() {
-        String[] cpuInfos = null;
-        try {
-            int pid = android.os.Process.myPid();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("/proc/" + pid + "/stat")), 1000);
-            String load = reader.readLine();
-            reader.close();
-            cpuInfos = load.split(" ");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        long appCpuTime = Long.parseLong(cpuInfos[13])
-                + Long.parseLong(cpuInfos[14]) + Long.parseLong(cpuInfos[15])
-                + Long.parseLong(cpuInfos[16]);
-        return appCpuTime;
+        return -1;
     }
 
 }

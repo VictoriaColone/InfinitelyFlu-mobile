@@ -2,6 +2,7 @@ package com.ximao.infinitelyflu_mobile.utils.apm;
 
 
 import androidx.annotation.NonNull;
+import java.text.DecimalFormat;
 
 
 /**
@@ -39,6 +40,10 @@ public class MemoryInfo {
     @NonNull
     @Override
     public String toString() {
-        return "max: " + maxMemory + "MB\n" + "total: " + totalMemory + "MB\n" + "free: " + freeMemory+ "MB" ;
+        DecimalFormat decimalFormat= new DecimalFormat( "0.00" );
+        return "max: " + decimalFormat.format(maxMemory) + "MB\n" + "total: " +
+                decimalFormat.format(totalMemory) + "MB\n" + "free: " +
+                decimalFormat.format(freeMemory) + "MB" ;
     }
+
 }

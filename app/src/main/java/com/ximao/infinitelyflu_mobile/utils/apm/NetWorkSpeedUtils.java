@@ -62,22 +62,21 @@ public class NetWorkSpeedUtils {
         Message msg = mHandler.obtainMessage();
         msg.what = 100;
         msg.obj = getTotalSpeed(speed, speed2);
-        // msg.obj = String.valueOf(speed) + "." + String.valueOf(speed2) + " kb/s";
         // 更新界面
         mHandler.sendMessage(msg);
     }
 
     private String getTotalSpeed(long speed, long speed2) {
         DecimalFormat showFloatFormat =new DecimalFormat("0.00");
-        Log.d("速度", "speed: "+speed+",speed2"+speed2);
         String totalSpeedStr = "";
         if (speed >= 1024) {
             totalSpeedStr = showFloatFormat.format(speed/1024)+" M/s";
         } else {
-            totalSpeedStr =showFloatFormat.format(speed+speed2/1024)+"K/s";
+            totalSpeedStr =showFloatFormat.format(speed+speed2/1024)+" K/s";
         }
         return totalSpeedStr;
     }
+
 }
 
 
