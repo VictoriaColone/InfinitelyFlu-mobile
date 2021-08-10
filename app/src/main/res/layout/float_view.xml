@@ -10,7 +10,20 @@
         android:id="@+id/network_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1111000"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/cpu_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/memory_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:textSize="14sp"/>
 

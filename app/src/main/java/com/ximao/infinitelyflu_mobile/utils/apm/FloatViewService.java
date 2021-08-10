@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
@@ -16,16 +15,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-
 import com.ximao.infinitelyflu_mobile.R;
+import java.lang.ref.WeakReference;
 
 
 /**
@@ -35,35 +30,46 @@ import com.ximao.infinitelyflu_mobile.R;
  */
 public class FloatViewService extends Service {
 
-    //定义浮动窗口布局
+    private static final String TAG = "FloatViewService";
+
+    /**
+     * 定义浮动窗口布局
+     */
     LinearLayout mFloatLayout;
 
     WindowManager.LayoutParams wmParams;
 
-    //创建浮动窗口设置布局参数的对象
+    /**
+     * 创建浮动窗口设置布局参数的对象
+     */
     WindowManager mWindowManager;
 
     private Context mContext;
 
-    TextView mFloatView;
+    TextView mNetTextView;
 
-    private long startTime;
+    TextView mCpuTextView;
 
-    private long endTime;
+    TextView mMemoryTextView;
 
-    private boolean isColor = true;
+    private Handler mHandler = new MainHandler(this);
 
-    private static final String TAG = "FloatViewService";
-
-    Handler handler = new Handler() {
+    /**
+     * 移动事件，悬浮窗上控件跟随移动
+     */
+    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            switch (msg.what) {
-                case 100:
-                    mFloatView.setText(msg.obj.toString());
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_MOVE:
+                    // getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
+                    wmParams.x = (int) event.getRawX() - mNetTextView.getMeasuredWidth() / 2;
+                    wmParams.y = (int) event.getRawY() - mNetTextView.getMeasuredHeight() / 2 - 25;
+                    // 刷新
+                    mWindowManager.updateViewLayout(mFloatLayout, wmParams);
                     break;
             }
-            super.handleMessage(msg);
+            return true;
         }
     };
 
@@ -72,7 +78,9 @@ public class FloatViewService extends Service {
         super.onCreate();
         mContext = FloatViewService.this;
         createFloatView();
-        new NetWorkSpeedUtils(this, handler).startShowNetSpeed();
+        new NetWorkSpeedUtils(this, mHandler).startShowNetSpeed();
+        new CpuMonitorUtils(mHandler).startShowCpuRate();
+        new MemoryUtils(mHandler).startShowMemoryUsage();
     }
 
     @Override
@@ -100,70 +108,28 @@ public class FloatViewService extends Service {
         // 调整悬浮窗显示的停靠位置为左侧置顶
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         // 以屏幕左上角为原点，设置x、y初始值
-        wmParams.x = 200;
-        wmParams.y = 200;
+        wmParams.x = 0;
+        wmParams.y = 1800;
         // 设置悬浮窗口长宽数据
         wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         wmParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
         LayoutInflater inflater = LayoutInflater.from(getApplication());
         // 获取浮动窗口视图所在布局
         mFloatLayout = (LinearLayout) inflater.inflate(R.layout.float_view, null);
-        mFloatView = mFloatLayout.findViewById(R.id.network_text);
+        mNetTextView = mFloatLayout.findViewById(R.id.network_text);
+        mCpuTextView = mFloatLayout.findViewById(R.id.cpu_text);
+        mMemoryTextView = mFloatLayout.findViewById(R.id.memory_text);
         mWindowManager.addView(mFloatLayout, wmParams);
 
         // 浮动窗口按钮
         mFloatLayout.measure(View.MeasureSpec.makeMeasureSpec(0,
                 View.MeasureSpec.UNSPECIFIED), View.MeasureSpec
                 .makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
         // 设置监听浮动窗口的触摸移动
-
-        mFloatView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                boolean isclick = false;
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        startTime = System.currentTimeMillis();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        // getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
-                        wmParams.x = (int) event.getRawX() - mFloatView.getMeasuredWidth() / 2;
-                        wmParams.y = (int) event.getRawY() - mFloatView.getMeasuredHeight() / 2 - 25;
-                        // 刷新
-                        mWindowManager.updateViewLayout(mFloatLayout, wmParams);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        endTime = System.currentTimeMillis();
-                        // 小于0.2秒被判断为点击
-                        if ((endTime - startTime) > 200) {
-                            isclick = false;
-                        } else {
-                            isclick = true;
-                        }
-                        break;
-                }
-                // 响应点击事件
-                if (isclick) {
-                    if (isColor) {
-                        mFloatView.setBackgroundColor(Color.RED);
-                        isColor = !isColor;
-                    } else {
-                        mFloatView.setBackgroundColor(Color.GREEN);
-                        isColor = !isColor;
-                    }
-                    Toast.makeText(mContext, "点击了", Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            }
-        });
-
-        mFloatView.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(FloatViewService.this, "onClick", Toast.LENGTH_SHORT).show();
-            }
-        });
+        mNetTextView.setOnTouchListener(onTouchListener);
+        mCpuTextView.setOnTouchListener(onTouchListener);
+        mMemoryTextView.setOnTouchListener(onTouchListener);
     }
 
     @Override
@@ -174,5 +140,40 @@ public class FloatViewService extends Service {
         }
     }
 
+    /**
+     * handler 静态内部类
+     */
+    static class MainHandler extends Handler {
+
+        // 弱引用<引用外部类>
+        WeakReference<FloatViewService> mService;
+        // 构造创建弱引用
+        MainHandler(FloatViewService service) {
+            mService = new WeakReference<>(service);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            // 通过弱引用获取外部类.
+            FloatViewService service = mService.get();
+            // 进行非空再操作
+            if (service != null) {
+                switch (msg.what) {
+                    case 100:
+                        service.mNetTextView.setText(msg.obj.toString());
+                        break;
+                    case 200:
+                        service.mCpuTextView.setText(msg.obj.toString());
+                        break;
+                    case 300:
+                        service.mMemoryTextView.setText(msg.obj.toString());
+                        break;
+                    default:
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        }
+    }
 }
 

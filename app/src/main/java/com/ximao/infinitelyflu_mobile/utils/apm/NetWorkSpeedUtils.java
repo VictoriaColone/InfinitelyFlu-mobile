@@ -1,13 +1,14 @@
 package com.ximao.infinitelyflu_mobile.utils.apm;
+
 import android.content.Context;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
 import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
+
 
 /**
  * @author ximao
@@ -39,12 +40,14 @@ public class NetWorkSpeedUtils {
     public void startShowNetSpeed() {
         lastTotalRxBytes = getTotalRxBytes();
         lastTimeStamp = System.currentTimeMillis();
-        // 1s后启动任务，每2s执行一次
-        new Timer().schedule(task, 1000, 1000);
+        // 每60ms执行一次
+        new Timer().schedule(task, 0, 60);
     }
 
     private long getTotalRxBytes() {
-        return TrafficStats.getUidRxBytes(context.getApplicationInfo().uid) == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalRxBytes() / 1024);//转为KB
+        // 转为KB
+        return TrafficStats.getUidRxBytes(context.getApplicationInfo().uid) ==
+                TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalRxBytes() / 1024);
     }
 
     private void showNetSpeed() {
