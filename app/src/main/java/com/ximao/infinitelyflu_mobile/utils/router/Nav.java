@@ -1,4 +1,4 @@
-package com.ximao.infinitelyflu_mobile.utils;
+package com.ximao.infinitelyflu_mobile.utils.router;
 
 
 import android.app.Activity;

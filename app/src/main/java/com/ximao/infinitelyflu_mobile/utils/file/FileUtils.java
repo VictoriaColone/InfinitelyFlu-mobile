@@ -1,19 +1,15 @@
-package com.ximao.infinitelyflu_mobile.utils;
+package com.ximao.infinitelyflu_mobile.utils.file;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * @author ximao
@@ -50,7 +46,6 @@ public class FileUtils {
     public static void downloadFileAsync(String templateName, String templateVersion, Context context,
                                          DownloadListener callback) {
         Log.d(TAG, "开始下载");
-
         /**
          * Android移动端与Tomcat建立连接：
          * 1. 在同一无墙网络环境下

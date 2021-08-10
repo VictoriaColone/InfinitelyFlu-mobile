@@ -1,27 +1,29 @@
 package com.ximao.infinitelyflu_mobile.ui;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.ximao.infinitelyflu_mobile.R;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
-import com.ximao.infinitelyflu_mobile.utils.DownloadListener;
-import com.ximao.infinitelyflu_mobile.utils.FileUtils;
-
+import com.ximao.infinitelyflu_mobile.utils.apm.FloatViewService;
+import com.ximao.infinitelyflu_mobile.utils.file.DownloadListener;
+import com.ximao.infinitelyflu_mobile.utils.file.FileUtils;
 import org.json.JSONObject;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -47,6 +49,8 @@ public class FetchTemplateActivity extends AppCompatActivity {
     private  EditText mTemplateName;
 
     private  EditText mTemplateVersion;
+
+    private Intent serviceIntent;
 
     private Callback mCallback = new Callback() {
         @Override
@@ -107,11 +111,19 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mLoadingProgressBar = findViewById(R.id.loading);
         initClickListener();
         InfinitelyFluEngine.newInstance(this);
+        showFloatView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 关闭悬浮控件
+        stopService(serviceIntent);
     }
 
     private void initClickListener() {
@@ -166,6 +178,19 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 startActivity(new Intent(FetchTemplateActivity.this, IFTemplatePreviewActivity.class));
             }
         });
+    }
+
+    /**
+     * 开启悬浮控件
+     */
+    private void showFloatView() {
+        //Android 6.0之后的悬浮窗动态申请,覆盖显示权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !Settings.canDrawOverlays(getApplicationContext())) {
+            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" +
+                    FetchTemplateActivity.this.getPackageName())));
+        }
+        serviceIntent= new Intent(FetchTemplateActivity.this, FloatViewService.class);
+        startService(serviceIntent);
     }
 
 }
