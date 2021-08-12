@@ -12,13 +12,17 @@ import android.os.IBinder;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+
+import com.didichuxing.doraemonkit.kit.network.NetworkManager;
+import com.didichuxing.doraemonkit.kit.performance.PerformanceDataManager;
+import com.didichuxing.doraemonkit.kit.performance.PerformanceDokitViewManager;
+import com.didichuxing.doraemonkit.kit.performance.datasource.DataSourceFactory;
 import com.ximao.infinitelyflu_mobile.R;
 import java.lang.ref.WeakReference;
 
@@ -46,6 +50,11 @@ public class FloatViewService extends Service {
 
     private Context mContext;
 
+    /**
+     * 是否打开心电图
+     */
+    private boolean isTurnOn = false;
+
     TextView mNetTextView;
 
     TextView mCpuTextView;
@@ -53,25 +62,6 @@ public class FloatViewService extends Service {
     TextView mMemoryTextView;
 
     private Handler mHandler = new MainHandler(this);
-
-    /**
-     * 移动事件，悬浮窗上控件跟随移动
-     */
-    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_MOVE:
-                    // getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
-                    wmParams.x = (int) event.getRawX() - mNetTextView.getMeasuredWidth() / 2;
-                    wmParams.y = (int) event.getRawY() - mNetTextView.getMeasuredHeight() / 2 - 25;
-                    // 刷新
-                    mWindowManager.updateViewLayout(mFloatLayout, wmParams);
-                    break;
-            }
-            return true;
-        }
-    };
 
     @Override
     public void onCreate() {
@@ -103,8 +93,6 @@ public class FloatViewService extends Service {
         wmParams.format = PixelFormat.RGBA_8888;
         // 设置浮动窗口不可聚焦（实现操作除浮动窗口外的其他可见窗口的操作）
         wmParams.flags = LayoutParams.FLAG_NOT_FOCUSABLE;
-        // LayoutParams.FLAG_NOT_TOUCH_MODAL |
-        // LayoutParams.FLAG_NOT_TOUCHABLE
         // 调整悬浮窗显示的停靠位置为左侧置顶
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         // 以屏幕左上角为原点，设置x、y初始值
@@ -120,16 +108,53 @@ public class FloatViewService extends Service {
         mCpuTextView = mFloatLayout.findViewById(R.id.cpu_text);
         mMemoryTextView = mFloatLayout.findViewById(R.id.memory_text);
         mWindowManager.addView(mFloatLayout, wmParams);
-
         // 浮动窗口按钮
         mFloatLayout.measure(View.MeasureSpec.makeMeasureSpec(0,
                 View.MeasureSpec.UNSPECIFIED), View.MeasureSpec
                 .makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        mFloatLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isTurnOn) {
+                    startMonitor();
+                } else {
+                    stopMonitor();
+                }
+                isTurnOn = !isTurnOn;
+            }
+        });
+    }
 
-        // 设置监听浮动窗口的触摸移动
-        mNetTextView.setOnTouchListener(onTouchListener);
-        mCpuTextView.setOnTouchListener(onTouchListener);
-        mMemoryTextView.setOnTouchListener(onTouchListener);
+    /**
+     * 开启监控视图
+     */
+    private void startMonitor() {
+        // 健康体检中找到调用，可以绕过fragment初始化&&id注册
+        PerformanceDataManager.getInstance().init();
+        NetworkManager.get().startMonitor();
+        PerformanceDataManager.getInstance().startMonitorNetFlowInfo();
+        PerformanceDataManager.getInstance().startMonitorCPUInfo();
+        PerformanceDataManager.getInstance().startMonitorFrameInfo();
+        PerformanceDataManager.getInstance().startMonitorMemoryInfo();
+        PerformanceDokitViewManager.open(DataSourceFactory.TYPE_NETWORK, getString(R.string.net_work),null);
+        PerformanceDokitViewManager.open(DataSourceFactory.TYPE_CPU, getString(R.string.cpu),null);
+        PerformanceDokitViewManager.open(DataSourceFactory.TYPE_RAM, getString(R.string.ram),null);
+        PerformanceDokitViewManager.open(DataSourceFactory.TYPE_FPS, getString(R.string.fps),null);
+    }
+
+    /**
+     * 关闭监控视图
+     */
+    private void stopMonitor() {
+        PerformanceDataManager.getInstance().stopMonitorCPUInfo();
+        PerformanceDataManager.getInstance().stopMonitorMemoryInfo();
+        PerformanceDataManager.getInstance().stopMonitorFrameInfo();
+        NetworkManager.get().stopMonitor();
+        PerformanceDataManager.getInstance().stopMonitorNetFlowInfo();
+        PerformanceDokitViewManager.close(DataSourceFactory.TYPE_NETWORK, getString(R.string.net_work));
+        PerformanceDokitViewManager.close(DataSourceFactory.TYPE_CPU, getString(R.string.cpu));
+        PerformanceDokitViewManager.close(DataSourceFactory.TYPE_RAM, getString(R.string.ram));
+        PerformanceDokitViewManager.close(DataSourceFactory.TYPE_FPS, getString(R.string.fps));
     }
 
     @Override

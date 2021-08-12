@@ -6,4 +6,8 @@
     <string name="fetch_template_xml">Fetch Template.xml</string>
     <string name="fetch_template_json">Fetch Template.json</string>
     <string name="open_preview">Open Preview</string>
+    <string name="net_work">网络</string>
+    <string name="cpu">CPU</string>
+    <string name="ram">内存</string>
+    <string name="fps">fps</string>
 </resources>
