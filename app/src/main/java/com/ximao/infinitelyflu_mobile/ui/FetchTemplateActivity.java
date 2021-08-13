@@ -14,10 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.ximao.infinitelyflu_mobile.R;
@@ -25,13 +23,10 @@ import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
 import com.ximao.infinitelyflu_mobile.utils.apm.FloatViewService;
 import com.ximao.infinitelyflu_mobile.utils.file.DownloadListener;
 import com.ximao.infinitelyflu_mobile.utils.file.FileUtils;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-
 import static com.alibaba.fastjson.JSON.parseObject;
 
 
