@@ -84,7 +84,7 @@ public class IFWidgetTreeFactory {
                     // 控件类型，先创建控件
                     view = createView(ViewConstant.VIEW_REFLECT_MAP.get(key.substring(0, key.indexOf("-"))));
                     if (view instanceof ViewGroup) {
-                        addViews((ViewGroup)view, jsonObject.getJSONObject(key));
+                        container.addView(addViews((ViewGroup)view, jsonObject.getJSONObject(key)));
                     } else {
                         org.json.JSONObject childAttributes =
                                 new org.json.JSONObject(jsonObject.getJSONObject(key).toJSONString());
@@ -101,13 +101,13 @@ public class IFWidgetTreeFactory {
                 attributes.put("parent_class", container.getClass());
                 styleView(container, attributes);
             }
-            if (view != null && view instanceof ViewGroup) {
-                container.addView(view);
-            }
+//            if (view != null && view instanceof ViewGroup) {
+//                container.addView(view);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return mContainer;
+        return container;
     }
 
     /**
