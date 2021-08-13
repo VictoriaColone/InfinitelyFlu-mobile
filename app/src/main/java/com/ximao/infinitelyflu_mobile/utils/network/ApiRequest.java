@@ -2,16 +2,14 @@ package com.ximao.infinitelyflu_mobile.utils.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
-
-import org.apache.commons.io.IOUtils;
 import com.ximao.infinitelyflu_mobile.utils.Util;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 
 public abstract class ApiRequest extends AsyncTask<Void, Void, String> {
 

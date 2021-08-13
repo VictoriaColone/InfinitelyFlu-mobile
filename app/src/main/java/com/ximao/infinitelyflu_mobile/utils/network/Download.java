@@ -4,7 +4,6 @@ import android.content.Context;
 import com.ximao.infinitelyflu_mobile.utils.Util;
 
 
-
 abstract class Download extends ApiRequest {
 
     Download(String url, Context context) {

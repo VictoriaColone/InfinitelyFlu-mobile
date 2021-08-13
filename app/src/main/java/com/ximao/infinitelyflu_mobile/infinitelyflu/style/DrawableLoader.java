@@ -4,9 +4,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-
 import androidx.annotation.RequiresApi;
-
 import com.ximao.infinitelyflu_mobile.utils.Util;
 import com.ximao.infinitelyflu_mobile.utils.network.ApiResponse;
 import com.ximao.infinitelyflu_mobile.utils.network.ImageDownload;
@@ -21,9 +19,7 @@ import java.nio.charset.StandardCharsets;
 final class DrawableLoader {
 
     private static final String TAG = "DrawableLoader";
-
     private int requestCode;
-
     private boolean cache, used;
     private OnDrawableLoadedListener listener;
     private Context context;
@@ -31,21 +27,19 @@ final class DrawableLoader {
     DrawableLoader(JSONObject attributes, OnDrawableLoadedListener listener, Context context) throws JSONException {
         this.listener = listener;
         this.context = context;
-
         if(attributes.has("cache")) {
             cache = attributes.getBoolean("cache");
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     void load(String src, int requestCode) {
         if(used) {
             Util.log(TAG, "DrawableLoader cannot be reused. Please construct new one to load another drawable.");
             return;
         }
-
         this.used = true;
         this.requestCode = requestCode;
-
         if(cache) {
             loadImageFromCache(src);
         }else {
@@ -56,6 +50,7 @@ final class DrawableLoader {
     private void loadImageFromServer(final String src) {
         final ImageDownload request = new ImageDownload(src, context);
         request.addHandler(new ApiResponse() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onSuccess(String response) {
                 if(cache) {
@@ -65,20 +60,19 @@ final class DrawableLoader {
                         Util.log("Image error", "Loading image from server and caching it produced the following error: " + e.getMessage());
                     }
                 }
-
                 listener.onDrawableLoaded(request.getDrawable(), requestCode);
             }
-
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onError(String message) {
                 Util.log("Image error", "Loading image from server produced the following error: " + message);
-
                 loadImageFromCache(src);
             }
         });
         request.start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void loadImageFromCache(String src) {
         byte[] bytes;
 

@@ -1,9 +1,9 @@
 package com.ximao.infinitelyflu_mobile.utils.network;
 
 import android.content.Context;
-
 import java.io.File;
 import java.io.FileWriter;
+
 
 public final class FileDownload extends Download {
 
