@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -15,16 +14,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.ximao.infinitelyflu_mobile.R;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
 import com.ximao.infinitelyflu_mobile.utils.apm.FloatViewService;
 import com.ximao.infinitelyflu_mobile.utils.file.DownloadListener;
 import com.ximao.infinitelyflu_mobile.utils.file.FileUtils;
-import org.json.JSONObject;
+
 import java.io.IOException;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static com.alibaba.fastjson.JSON.parseObject;
 
 
 /**
@@ -62,25 +70,26 @@ public class FetchTemplateActivity extends AppCompatActivity {
             });
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onResponse(Call call, Response response) throws IOException {
-            JSONObject jsonObject = null;
             String responseData = "";
             // 网络线程
             try {
-                if (TextUtils.isEmpty(response.body().string())) {
+                responseData = response.body().string();
+                if (TextUtils.isEmpty(responseData)) {
                     return;
                 }
-                Log.d(TAG, "onResponse:" + response.body().string());
-                responseData = response.body().string();
-                jsonObject = new JSONObject(responseData);
+                Log.d(TAG, "onResponse:" + responseData);
+                // OrderedField保证有序性
+                JSONObject jsonObject = parseObject(responseData, Feature.OrderedField);
                 if (jsonObject == null) {
                     return;
                 }
-                // yutao todo 保存json到本地
-                InfinitelyFluEngine.getInstance().cacheTemplateJson();
                 // Json获取后，创建视图
                 InfinitelyFluEngine.getInstance().creatView(jsonObject);
+                // yutao todo json缓存策略
+                InfinitelyFluEngine.getInstance().cacheTemplateJson();
             } catch (Exception e) {
                 e.printStackTrace();
             }

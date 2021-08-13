@@ -1,11 +1,17 @@
 package com.ximao.infinitelyflu_mobile.infinitelyflu;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import org.json.JSONObject;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.ArrayList;
 
 
@@ -24,6 +30,10 @@ public class InfinitelyFluEngine {
      * 单例
      */
     private volatile static InfinitelyFluEngine mInfinitelyFluEngine;
+    /**
+     * 主线程Handler
+     */
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     /**
      * 根视图View
      */
@@ -86,24 +96,17 @@ public class InfinitelyFluEngine {
     /**
      * 创建视图
      */
-    @SuppressLint("ResourceAsColor")
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void creatView(JSONObject jsonObject) {
-        View templateView = IFWidgetTreeFactory.createViewTree(jsonObject);
-//        TextView parentView = new TextView(mContext);
-//        parentView.setText("yutao=======test");
-//        mViewSet.add(parentView);
-//        TextView childView = new TextView(mContext);
-//        childView.setText("yutao===test");
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//        LinearLayout view = new LinearLayout(mContext);
-//
-//
-//        view.setBackgroundColor(R.color.design_dark_default_color_background);
-//        view.setLayoutParams(lp);//设置布局参数
-//        view.setOrientation(LinearLayout.VERTICAL);// 设置子View的Linearlayout// 为垂直方向布局
-//        view.addView(childView);
+        IFWidgetTreeFactory ifWidgetTreeFactory = new IFWidgetTreeFactory(mContext);
+        View templateView = ifWidgetTreeFactory.createViewTree(jsonObject);
         if (templateView == null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, "JsonParse Failed", Toast.LENGTH_LONG).show();
+                }
+            });
             return;
         }
         mViewSet.add(templateView);
