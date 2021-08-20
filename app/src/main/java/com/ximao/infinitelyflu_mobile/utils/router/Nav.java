@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 
 /**
@@ -20,11 +21,16 @@ public class Nav {
     /**
      * 上下文
      */
-    private final Context mContext;
+    private Context mContext;
     /**
      * 唤起参数
      */
     private Bundle mOptions;
+
+    /**
+     * 空参构造，提供给点击事件调用
+     */
+    public Nav() {}
 
     private Nav(Context context) {
         this.mContext = context;
@@ -75,6 +81,33 @@ public class Nav {
      */
     public interface CallBack {
         void onResult(boolean var1, Intent var2);
+    }
+
+    /*************************************  IF模板静态调用点击事件  *************************************/
+    /**
+     * <onClick
+     *      class="com.ximao.infinitelyflu_mobile.utils.router.Nav"
+     *      method="longToast">
+     *      <parameters
+     *          type="android.content.Context"/>
+     *      <parameters
+     *          type="java.lang.String"
+     *          value="hello, InfinitelyFlu~~~"/>
+     * </onClick>
+     */
+
+    /**
+     * 长吐司
+     */
+    public static void longToast(Context context, String content) {
+        Toast.makeText(context, content, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * 短吐司
+     */
+    public static void shortToast(Context context, String content) {
+        Toast.makeText(context, content, Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -36,7 +36,7 @@ public class FileUtils {
     public static final String EQUALS_SIGN = "=";
 
     // 这个地址会IP需要实时变更，可以用ifconfig en0 查询，也可以用charles查询
-    private static final String URL = "http://192.168.0.103:8080/InfinitelyFlu_server_war/template/";
+    private static final String URL = "http://30.25.158.55:8080/InfinitelyFlu_server_war/template/";
 
     /**
      * 下载文件

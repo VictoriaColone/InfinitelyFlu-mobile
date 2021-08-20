@@ -14,7 +14,7 @@ import java.util.List;
 
 final class MethodInvoker {
 
-    private static final String TAG = "Dynamico.MethodInvoker";
+    private static final String TAG = "MethodInvoker";
     private JSONObject attributes;
     private ArrayList<Class> types;
     private ArrayList<Object> args;
@@ -89,7 +89,7 @@ final class MethodInvoker {
         private MethodInvoker invoker;
 
         /**
-         * Constructor used for invoking static methods
+         * 调用静态方法实现点击事件————不需要指定方法执行对象
          * @param attributes holds class name, method name and array of parameters
          * @param context some methods invoked with reflection might be context dependent
          * @throws Exception if MethodInvoker's construction produces Exception
@@ -99,7 +99,7 @@ final class MethodInvoker {
         }
 
         /**
-         * Constructor used for invoking instance methods
+         * 动态反射构造对象调动方法实现点击事件————需要指定方法执行对象
          * @param custom instance of a class which methods are going to be invoked
          * @param attributes holds method name and array of parameters
          * @param context some methods invoked with reflection might be context dependent
