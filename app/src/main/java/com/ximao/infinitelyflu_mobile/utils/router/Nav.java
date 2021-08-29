@@ -2,11 +2,15 @@ package com.ximao.infinitelyflu_mobile.utils.router;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
+
+import com.ximao.infinitelyflu_mobile.IFApplication;
 
 
 /**
@@ -68,7 +72,7 @@ public class Nav {
      * 带回调跳转uri
      */
     public boolean toUri(String uri, Nav.CallBack callBack) {
-        if (null == uri) {
+        if (TextUtils.isEmpty(uri)) {
             return false;
         }
         Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(uri));
@@ -84,7 +88,10 @@ public class Nav {
     }
 
     /*************************************  IF模板静态调用点击事件  *************************************/
+
     /**
+     * @DEMO：
+     *
      * <onClick
      *      class="com.ximao.infinitelyflu_mobile.utils.router.Nav"
      *      method="longToast">
@@ -108,6 +115,20 @@ public class Nav {
      */
     public static void shortToast(Context context, String content) {
         Toast.makeText(context, content, Toast.LENGTH_SHORT).show();
+    }
+
+
+    /**
+     * 通过获取顶部Activity进行跳转
+     * @使用场景 如需要在当前Activity弹出对话框，由于视图创建实际提前，IF引擎中
+     * 传来的context是FetchTemplateActivity
+     */
+    public static void ifToUri(Context context, String uri) {
+        if (TextUtils.isEmpty(uri)) {
+            return;
+        }
+        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(uri));
+        IFApplication.getInstance().getCurrentActivity().startActivity(intent);
     }
 
 }
