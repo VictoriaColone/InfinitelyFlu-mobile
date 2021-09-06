@@ -1,8 +1,12 @@
 package com.ximao.infinitelyflu_mobile.infinitelyflu.style;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.widget.GridLayout;
+
+import androidx.annotation.RequiresApi;
+
 import com.ximao.infinitelyflu_mobile.infinitelyflu.IFWidgetTreeFactory;
 import org.json.JSONObject;
 
@@ -14,6 +18,7 @@ public final class GridLayoutStyler extends ViewStyler {
         super(factory, context);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public View style(View view, JSONObject attributes) throws Exception {
         super.style(view, attributes);

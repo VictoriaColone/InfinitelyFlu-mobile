@@ -1,14 +1,13 @@
-package com.ximao.infinitelyflu_mobile.ui;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.ximao.infinitelyflu_mobile.activity;
 
 import android.net.http.SslError;
 import android.os.Bundle;
-import com.ximao.infinitelyflu_mobile.R;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import androidx.appcompat.app.AppCompatActivity;
+import com.ximao.infinitelyflu_mobile.R;
 
 
 /**

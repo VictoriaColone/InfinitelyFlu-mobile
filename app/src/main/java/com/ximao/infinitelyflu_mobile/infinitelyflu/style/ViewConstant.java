@@ -22,6 +22,8 @@ public class ViewConstant {
 
     public static final String GRID_LAYOUT = "GridLayout";
 
+    public static final String SENSOR_LAYOUT = "SensorLayout";
+
     public static final String GRID_VIEW = "GridView";
 
     public static final String IMAGE_VIEW = "ImageView";
@@ -39,6 +41,7 @@ public class ViewConstant {
         put(LINEAR_LAYOUT, "android.widget.LinearLayout");
         put(RELATIVE_LAYOUT, "android.widget.RelativeLayout");
         put(GRID_LAYOUT, "android.widget.GridLayout");
+        put(SENSOR_LAYOUT, "com.ximao.infinitelyflu_mobile.ui.SensorLayout");
         put(GRID_VIEW, "android.widget.GridView");
         put(IMAGE_VIEW, "android.widget.ImageView");
         put(SCROLL_VIEW, "android.widget.ScrollView");

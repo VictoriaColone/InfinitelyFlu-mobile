@@ -1,5 +1,7 @@
-package com.ximao.infinitelyflu_mobile.ui;
+package com.ximao.infinitelyflu_mobile.activity;
 
+
+import static com.alibaba.fastjson.JSON.parseObject;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -27,7 +29,6 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-import static com.alibaba.fastjson.JSON.parseObject;
 
 
 /**

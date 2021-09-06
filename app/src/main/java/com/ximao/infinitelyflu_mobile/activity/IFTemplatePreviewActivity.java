@@ -1,8 +1,8 @@
-package com.ximao.infinitelyflu_mobile.ui;
+package com.ximao.infinitelyflu_mobile.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import androidx.appcompat.app.AppCompatActivity;
 import com.ximao.infinitelyflu_mobile.R;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
 

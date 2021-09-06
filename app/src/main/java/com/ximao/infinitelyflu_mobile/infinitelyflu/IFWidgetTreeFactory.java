@@ -16,7 +16,9 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
 import androidx.annotation.RequiresApi;
+
 import com.alibaba.fastjson.JSONObject;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.CompoundButtonStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.CustomViewStyler;
@@ -27,11 +29,14 @@ import com.ximao.infinitelyflu_mobile.infinitelyflu.style.ImageViewStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.LinearLayoutStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.RelativeLayoutStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.ScrollViewStyler;
+import com.ximao.infinitelyflu_mobile.infinitelyflu.style.SensorLayoutStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.SwitchStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.TextViewStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.ToggleButtonStyler;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.style.ViewConstant;
+import com.ximao.infinitelyflu_mobile.ui.SensorLayout;
 import com.ximao.infinitelyflu_mobile.utils.Util;
+
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
@@ -71,6 +76,7 @@ public class IFWidgetTreeFactory {
     /**
      * 添加视图
      */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private View addViews(ViewGroup container, JSONObject jsonObject) {
 
         Util.log(TAG, "Adding children for view " + container.getClass().getSimpleName());
@@ -101,9 +107,6 @@ public class IFWidgetTreeFactory {
                 attributes.put("parent_class", container.getClass());
                 styleView(container, attributes);
             }
-//            if (view != null && view instanceof ViewGroup) {
-//                container.addView(view);
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,30 +129,37 @@ public class IFWidgetTreeFactory {
     /**
      * 设置视图属性
      */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View styleView(View view, org.json.JSONObject attributes) throws Exception {
         Util.log(TAG, "Styling view " + view.getClass().getSimpleName());
 
-        if(view instanceof Switch) {
+        /**
+         * 控件属性调用此处要注意：
+         * 子类控件初始化应写在父类控件初始化之前，否则无法为特有属性赋值
+         */
+        if (view instanceof Switch) {
             view = new SwitchStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof ToggleButton) {
+        } else if (view instanceof ToggleButton) {
             view = new ToggleButtonStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof CompoundButton) {
+        } else if (view instanceof CompoundButton) {
             view = new CompoundButtonStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof TextView) {
+        } else if (view instanceof TextView) {
             view = new TextViewStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof ImageView) {
+        } else if (view instanceof ImageView) {
             view = new ImageViewStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof LinearLayout) {
+        } else if (view instanceof LinearLayout) {
             view = new LinearLayoutStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof RelativeLayout) {
+        } else if (view instanceof RelativeLayout) {
             view = new RelativeLayoutStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof GridLayout) {
+        } else if (view instanceof GridLayout) {
             view = new GridLayoutStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof GridView) {
+        } else if (view instanceof GridView) {
             view = new GridViewStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof ScrollView) {
+        } else if (view instanceof ScrollView) {
             view = new ScrollViewStyler(this, mContext).style(view, attributes);
-        }else if(view instanceof FrameLayout) {
+        } else if (view instanceof SensorLayout) {
+            view = new SensorLayoutStyler(this, mContext).style(view, attributes);
+        } else if (view instanceof FrameLayout) {
             view = new FrameLayoutStyler(this, mContext).style(view, attributes);
         }
         view = new CustomViewStyler(this, mContext).style(view, attributes);

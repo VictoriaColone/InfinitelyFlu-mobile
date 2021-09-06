@@ -3,8 +3,12 @@ package com.ximao.infinitelyflu_mobile.infinitelyflu.style;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.RequiresApi;
+
 import com.ximao.infinitelyflu_mobile.infinitelyflu.IFWidgetTreeFactory;
 import com.ximao.infinitelyflu_mobile.utils.Util;
 import org.json.JSONArray;
@@ -22,6 +26,7 @@ class ViewStyler implements Styler {
         this.context = context;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public View style(final View view, JSONObject attributes) throws Exception {
         ViewGroup.MarginLayoutParams params = new ParamsFactory(view, attributes).getParams();
