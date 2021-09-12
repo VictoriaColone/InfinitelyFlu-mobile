@@ -1,15 +1,23 @@
 package com.ximao.infinitelyflu_mobile.utils.file;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
+import androidx.annotation.RequiresApi;
+import com.ximao.infinitelyflu_mobile.IFApplication;
+import com.ximao.infinitelyflu_mobile.activity.ifInterface.GetJsonFromCacheCallback;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import static android.content.Context.MODE_APPEND;
 
 
 /**
@@ -44,7 +52,7 @@ public class FileUtils {
      * @param templateVersion
      * @param callback
      */
-    public static void downloadFileAsync(String templateName, String templateVersion, Context context,
+    public static void downloadFileAsync(String templateName, String templateVersion,
                                          DownloadListener callback) {
         Log.d(TAG, "开始下载");
         /**
@@ -54,6 +62,10 @@ public class FileUtils {
          *    越过网络安全检查
          * 3. ip地址不能用localhost，Mac系统通过终端命令 ifconfig en0 获取ip地址
          */
+        Context context = IFApplication.getInstance();
+        if (context == null) {
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -98,24 +110,87 @@ public class FileUtils {
      * @param templateVersion
      * @param callback
      */
-    public static void getTemplateJsonAsync(String templateName, String templateVersion, Callback callback) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void getTemplateJsonAsync(String templateName, String templateVersion, Callback callback,
+                                            GetJsonFromCacheCallback cacheCallback) {
         Log.d(TAG, "开始获取Json");
+        // 比对模板名&&版本号，如果有缓存，从缓存中获取，若无，后端拉取
+        if (TextUtils.isEmpty(templateName) || TextUtils.isEmpty(templateVersion)) {
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                URL url = null;
-                try {
-                    url = new URL(URL + METHOD_GET_TEMPLATE_JSON + QUESTION_SIGN +
-                            NAME + EQUALS_SIGN + templateName + CONNECT_SIGN + VERSION + EQUALS_SIGN +
-                            templateVersion);
-                    OkHttpClient client=new OkHttpClient();
-                    Request request=new Request.Builder().url(url).build();
-                    client.newCall(request).enqueue(callback);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                String response = FileUtils.read(templateName + templateVersion);
+                if (!TextUtils.isEmpty(response)) {
+                    cacheCallback.onResponse(response);
+                } else {
+                    URL url = null;
+                    try {
+                        url = new URL(URL + METHOD_GET_TEMPLATE_JSON + QUESTION_SIGN +
+                                NAME + EQUALS_SIGN + templateName + CONNECT_SIGN + VERSION + EQUALS_SIGN +
+                                templateVersion);
+                        OkHttpClient client=new OkHttpClient();
+                        Request request=new Request.Builder().url(url).build();
+                        client.newCall(request).enqueue(callback);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
+    }
+
+    /**
+     * 读取Json文件
+     * @param fileName 文件名 格式：模板名+版本号
+     */
+    public static String read(String fileName) {
+        Context context = IFApplication.getInstance();
+        if (context == null) {
+            return null;
+        }
+        try {
+            FileInputStream inStream = context.openFileInput(fileName);
+            byte[] buffer = new byte[1024];
+            int hasRead = 0;
+            StringBuilder sb = new StringBuilder();
+            while ((hasRead = inStream.read(buffer)) != -1) {
+                sb.append(new String(buffer, 0, hasRead));
+            }
+            inStream.close();
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 缓存Json文件
+     * @param templateName
+     * @param templateVersion
+     * @param responseData
+     */
+    public static void cacheTemplateJson(String templateName, String templateVersion,
+                                         String responseData) {
+        Context context = IFApplication.getInstance();
+        if (context == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(templateName) || TextUtils.isEmpty(templateVersion)
+                || TextUtils.isEmpty(responseData)) {
+            return;
+        }
+        String fileName = templateName + templateVersion;
+        try {
+            FileOutputStream fos = context.openFileOutput(fileName, MODE_APPEND);
+            fos.write(responseData.getBytes());
+            fos.close();
+        } catch (Exception e) {
+            Log.e(TAG, "cacheTemplateJson: Failed");
+            e.printStackTrace();
+        }
     }
 
 }

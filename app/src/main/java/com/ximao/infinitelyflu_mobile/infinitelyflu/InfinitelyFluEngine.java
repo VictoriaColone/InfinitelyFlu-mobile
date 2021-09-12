@@ -7,11 +7,9 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
-
 import com.alibaba.fastjson.JSONObject;
-
+import com.ximao.infinitelyflu_mobile.utils.file.FileUtils;
 import java.util.ArrayList;
 
 
@@ -134,8 +132,12 @@ public class InfinitelyFluEngine {
 
     /**
      * 缓存TemplateJson
+     * @param templateName
+     * @param templateVersion
+     * @param responseData
      */
-    public void cacheTemplateJson() {
+    public void cacheTemplateJson(String templateName, String templateVersion, String responseData) {
+        FileUtils.cacheTemplateJson(templateName, templateVersion, responseData);
     }
 
 }

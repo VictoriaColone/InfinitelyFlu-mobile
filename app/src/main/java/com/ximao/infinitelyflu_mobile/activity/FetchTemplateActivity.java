@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.ximao.infinitelyflu_mobile.R;
+import com.ximao.infinitelyflu_mobile.activity.ifInterface.GetJsonFromCacheCallback;
 import com.ximao.infinitelyflu_mobile.infinitelyflu.InfinitelyFluEngine;
 import com.ximao.infinitelyflu_mobile.utils.apm.FloatViewService;
 import com.ximao.infinitelyflu_mobile.utils.file.DownloadListener;
@@ -36,7 +37,7 @@ import okhttp3.Response;
  * @date 2021/7/21
  * 拉取Template Activity
  */
-public class FetchTemplateActivity extends AppCompatActivity {
+public class FetchTemplateActivity extends AppCompatActivity implements GetJsonFromCacheCallback {
 
     private static final String TAG = "FetchTemplateActivity";
 
@@ -54,6 +55,9 @@ public class FetchTemplateActivity extends AppCompatActivity {
 
     private Intent serviceIntent;
 
+    /**
+     * 请求json回调
+     */
     private Callback mCallback = new Callback() {
         @Override
         public void onFailure(Call call, IOException e) {
@@ -68,7 +72,7 @@ public class FetchTemplateActivity extends AppCompatActivity {
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
-        public void onResponse(Call call, Response response) throws IOException {
+        public void onResponse(Call call, Response response) {
             String responseData = "";
             // 网络线程
             try {
@@ -84,8 +88,10 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 }
                 // Json获取后，创建视图
                 InfinitelyFluEngine.getInstance().creatView(jsonObject);
-                // yutao todo json缓存策略
-                InfinitelyFluEngine.getInstance().cacheTemplateJson();
+                // Json数据缓存
+                InfinitelyFluEngine.getInstance().cacheTemplateJson(mTemplateName.getText().toString(),
+                        mTemplateVersion.getText().toString(),responseData);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -103,7 +109,6 @@ public class FetchTemplateActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fetch_template);
         mTemplateName = findViewById(R.id.name);
@@ -114,17 +119,17 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mLoadingProgressBar = findViewById(R.id.loading);
         initClickListener();
         InfinitelyFluEngine.newInstance(this);
-        showFloatView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        showFloatView();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         // 关闭悬浮控件
         stopService(serviceIntent);
     }
@@ -140,23 +145,25 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(templateName) && !TextUtils.isEmpty(templateVersion)) {
                     Log.d(TAG, templateName + "   " + templateVersion);
                     // 文件下载
-                    FileUtils.downloadFileAsync(templateName, templateVersion, getApplicationContext(),
-                            new DownloadListener() {
+                    FileUtils.downloadFileAsync(templateName, templateVersion, new DownloadListener() {
                         @Override
                         public void downloadCallback() {
                             mLoadingProgressBar.setVisibility(View.GONE);
-                            Toast.makeText(getBaseContext(), "Download Success", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), "Download Success",
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
                 } else {
                     mLoadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getBaseContext(), "Input Expection!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), "Input Expection!",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
 
         // 获取Json
         mFetchJsonButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 mLoadingProgressBar.setVisibility(View.VISIBLE);
@@ -165,11 +172,13 @@ public class FetchTemplateActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(templateName) && !TextUtils.isEmpty(templateVersion)) {
                     Log.d(TAG, templateName + "   " + templateVersion);
                     // 获取json
-                    FileUtils.getTemplateJsonAsync(templateName, templateVersion, mCallback);
+                    FileUtils.getTemplateJsonAsync(templateName, templateVersion, mCallback,
+                            FetchTemplateActivity.this);
                 } else {
                     Log.d(TAG, templateName + "   " + templateVersion);
                     mLoadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getBaseContext(), "Input Expection!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), "Input Exception!",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -178,7 +187,8 @@ public class FetchTemplateActivity extends AppCompatActivity {
         mOpenPreviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FetchTemplateActivity.this, IFTemplatePreviewActivity.class));
+                startActivity(new Intent(FetchTemplateActivity.this,
+                        IFTemplatePreviewActivity.class));
             }
         });
     }
@@ -194,6 +204,34 @@ public class FetchTemplateActivity extends AppCompatActivity {
         }
         serviceIntent= new Intent(FetchTemplateActivity.this, FloatViewService.class);
         startService(serviceIntent);
+    }
+
+
+    /**
+     * 缓存获取数据后回调
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onResponse(String response) {
+        if (TextUtils.isEmpty(response)) {
+            return;
+        }
+        Log.d(TAG, "onResponse:" + response);
+        // OrderedField保证有序性
+        JSONObject jsonObject = parseObject(response, Feature.OrderedField);
+        if (jsonObject == null) {
+            return;
+        }
+        // Json获取后，创建视图
+        InfinitelyFluEngine.getInstance().creatView(jsonObject);
+        // 主线程
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                mLoadingProgressBar.setVisibility(View.GONE);
+                Toast.makeText(getBaseContext(), "Get Json Success", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }
