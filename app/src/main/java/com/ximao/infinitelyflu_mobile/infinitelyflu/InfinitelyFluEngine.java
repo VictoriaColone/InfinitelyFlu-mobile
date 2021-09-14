@@ -44,7 +44,6 @@ public class InfinitelyFluEngine {
      * 视图集
      */
     public ArrayList<View> mViewSet = new ArrayList<>();
-
     /**
      * 构造函数
      * @param context

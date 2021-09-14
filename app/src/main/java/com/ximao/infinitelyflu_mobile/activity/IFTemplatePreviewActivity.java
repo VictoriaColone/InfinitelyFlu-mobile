@@ -43,6 +43,6 @@ public class IFTemplatePreviewActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        InfinitelyFluEngine.getInstance().clearIFData();
+        mIFEngine.clearIFData();
     }
 }
