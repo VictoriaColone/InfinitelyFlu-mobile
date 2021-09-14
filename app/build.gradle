@@ -8,7 +8,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.infinitelyflu_mobile"
+        applicationId "com.ximao.infinitelyflu_mobile"
         minSdkVersion 17
         targetSdkVersion 29
         versionCode 1

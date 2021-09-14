@@ -34,7 +34,6 @@ public class IFTemplatePreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
         mContainer = findViewById(R.id.rv_main_container);
-        mContainer.removeAllViews();
         // 将RootView传入到IF引擎中
         mIFEngine.setRootView(mContainer);
         // 插入视图

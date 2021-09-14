@@ -1,23 +1,28 @@
 package com.ximao.infinitelyflu_mobile.utils.file;
 
+import static android.content.Context.MODE_APPEND;
+
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+
 import androidx.annotation.RequiresApi;
+
 import com.ximao.infinitelyflu_mobile.IFApplication;
 import com.ximao.infinitelyflu_mobile.activity.ifInterface.GetJsonFromCacheCallback;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import static android.content.Context.MODE_APPEND;
 
 
 /**
@@ -44,7 +49,7 @@ public class FileUtils {
     public static final String EQUALS_SIGN = "=";
 
     // 这个地址会IP需要实时变更，可以用ifconfig en0 查询，也可以用charles查询
-    private static final String URL = "http://30.25.158.130:8080/InfinitelyFlu_server_war/template/";
+    private static final String URL = "http://30.7.243.4:8080/InfinitelyFlu_server_war/template/";
 
     /**
      * 下载文件

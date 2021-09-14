@@ -114,8 +114,10 @@ public class InfinitelyFluEngine {
      * 使用前调用View.getchildAt()定位父布局
      */
     public void insertView() {
-        mRootView.removeAllViews();
         for (View view : mViewSet) {
+            if (view.getParent() != null) {
+                ((ViewGroup)view.getParent()).removeView(view);
+            }
             mRootView.addView(view);
         }
     }
